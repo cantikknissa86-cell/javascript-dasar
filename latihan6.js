@@ -1,60 +1,68 @@
-const books = [
+const authors = [
   {
-    title: "Belajar JavaScript",
-    author: "Andi",
-    year: 2022,
-    available: true
+    id: 1,
+    name: "Robert C. Martin",
+    country: "USA"
   },
   {
-    title: "Dasar HTML",
-    author: "Budi",
-    year: 2019,
-    available: false
+    id: 2,
+    name: "James Clear",
+    country: "USA"
   },
   {
-    title: "CSS Modern",
-    author: "Caca",
-    year: 2021,
-    available: true
+    id: 3,
+    name: "Marijn Haverbeke",
+    country: "Netherlands"
   },
   {
-    title: "Node.js",
-    author: "Dina",
-    year: 2023,
-    available: false
+    id: 4,
+    name: "Andrea Hirata",
+    country: "Indonesia"
   }
 ];
 
-let tersedia = 0;
-let dipinjam = 0;
-
-console.log("=== Seluruh Buku ===");
-for (let i = 0; i < books.length; i++) {
-  console.log(
-    books[i].title +
-      " | " +
-      books[i].author +
-      " | " +
-      books[i].year
-  );
-}
-
-console.log("\n=== Buku Tersedia ===");
-for (let i = 0; i < books.length; i++) {
-  if (books[i].available) {
-    console.log(books[i].title);
-    tersedia++;
-  } else {
-    dipinjam++;
+const books = [
+  {
+    id: 1,
+    title: "Clean Code",
+    authorId: 1,
+    year: 2008,
+    available: true
+  },
+  {
+    id: 2,
+    title: "Atomic Habits",
+    authorId: 2,
+    year: 2018,
+    available: false
+  },
+  {
+    id: 3,
+    title: "Eloquent JavaScript",
+    authorId: 3,
+    year: 2019,
+    available: true
+  },
+  {
+    id: 4,
+    title: "Laskar Pelangi",
+    authorId: 4,
+    year: 2005,
+    available: true
   }
-}
-console.log("\nJumlah Buku : " + books.length);
-console.log("Jumlah Buku Tersedia : " + tersedia);
-console.log("Jumlah Buku Dipinjam : " + dipinjam);
+];
 
-console.log("\n=== Buku Terbit Setelah 2020 ===");
-for (let i = 0; i < books.length; i++) {
-  if (books[i].year > 2020) {
-    console.log(books[i].title + " (" + books[i].year + ")");
-  }
-}
+
+books.forEach(book => {
+  const author = authors.find(a => a.id === book.authorId);
+  console.log(book.title);
+  console.log(`Penulis: ${author.name}`);
+  console.log(`Negara ${author.country}`);
+  console.log(`Tahun ${book.year}`);
+  
+  const statusTeks = book.available ? "Tersedia" : "Dipinjam";
+  console.log(`Status: ${statusTeks}`);
+  
+  
+  console.log("-----------------------");
+});
