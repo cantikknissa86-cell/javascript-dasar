@@ -51,10 +51,15 @@ const books = [
     available: true
   }
 ];
-authors.forEach(author => {
-  const jumlahBuku = books.filter(book => book.authorId === author.id).length;
+const negara = "Indonesia";
 
-  console.log(author.name);
-  console.log("Jumlah Buku :", jumlahBuku);
-  console.log("----------------");
+books.forEach(book => {
+  const author = authors.find(a => a.id === book.authorId);
+
+  if (author && author.country === negara) {
+    console.log(book.title);
+    console.log(author.name);
+    console.log(author.country);
+    console.log("----------------");
+  }
 });

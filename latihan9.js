@@ -49,12 +49,26 @@ const books = [
     authorId: 4,
     year: 2005,
     available: true
+  },
+  {
+    id: 5,
+    title: "Unknown Book",
+    authorId: 99,
+    year: 2024,
+    available: true
   }
 ];
-authors.forEach(author => {
-  const jumlahBuku = books.filter(book => book.authorId === author.id).length;
+books.forEach(book => {
+  const author = authors.find(a => a.id === book.authorId);
 
-  console.log(author.name);
-  console.log("Jumlah Buku :", jumlahBuku);
+  console.log(book.title);
+
+  if (author) {
+    console.log("Author :", author.name);
+  } else {
+    console.log("ERROR");
+    console.log("Author tidak ditemukan.");
+  }
+
   console.log("----------------");
 });
