@@ -1,64 +1,72 @@
-// 1. Ambil data dari localStorage saat halaman pertama kali dimuat.
-// Jika belum ada data tersimpan, gunakan Array kosong [].
-// JSON.parse digunakan untuk mengubah string teks kembali menjadi Array/Object.
-let dataBuku = JSON.parse(localStorage.getItem('daftarBukuSimpanan')) || [];
+const input = document.getElementById("nama_buku");
+const btnTambah = document.getElementById("tambah");
+const list = document.querySelector(".data-buku");
 
-// 2. Ambil elemen DOM dari HTML
-const inputBuku = document.querySelector('input[name="nama_buku"]');
-const btnTambah = document.getElementById('tambah');
-const listBuku = document.querySelector('.data-buku');
+// Ambil data dari localStorage
+let books = JSON.parse(localStorage.getItem("books")) || [];
 
-// 3. Fungsi untuk menyimpan data array ke LocalStorage
-function simpanKeLocalStorage() {
-  // JSON.stringify digunakan karena localStorage hanya bisa menyimpan teks (string)
-  localStorage.setItem('daftarBukuSimpanan', JSON.stringify(dataBuku));
+// Simpan ke localStorage
+function simpanData() {
+    localStorage.setItem("books", JSON.stringify(books));
 }
 
-// 4. Fungsi untuk menampilkan data ke daftar (<ul>)
+// Tampilkan data
 function tampilkanData() {
-  // Kosongkan tampilan ul terlebih dahulu
-  listBuku.innerHTML = '';
+    list.innerHTML = "";
 
-  // Loop setiap data di dalam array
-  dataBuku.forEach((buku) => {
-    const li = document.createElement('li');
-    li.textContent = buku.nama; // Menampilkan nama buku
-    listBuku.appendChild(li);
-  });
+    books.forEach((book, index) => {
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            ${book}
+            <button onclick="editBuku(${index})">Edit</button>
+            <button onclick="hapusBuku(${index})">Hapus</button>
+        `;
+
+        list.appendChild(li);
+    });
 }
 
-// 5. Fungsi Tambah Buku (Menggunakan .push())
-function tambahBuku() {
-  const teksBuku = inputBuku.value.trim();
+// Tambah data
+btnTambah.addEventListener("click", () => {
+    const nama = input.value.trim();
 
-  // Validasi jika input kosong
-  if (teksBuku === '') {
-    alert('Nama buku tidak boleh kosong!');
-    return;
-  }
+    if (nama === "") {
+        alert("Nama buku tidak boleh kosong!");
+        return;
+    }
 
-  // Membuat object buku baru
-  const bukuBaru = {
-    id: Date.now(),
-    nama: teksBuku
-  };
+    books.push(nama);
 
-  // Menambahkan object ke dalam Array memakai .push()
-  dataBuku.push(bukuBaru);
+    simpanData();
+    tampilkanData();
 
-  // SIMPAN PERUBAHAN KE LOCALSTORAGE
-  simpanKeLocalStorage();
+    input.value = "";
+});
 
-  // Kosongkan kolom input
-  inputBuku.value = '';
+// Edit data
+function editBuku(index) {
+    const namaBaru = prompt("Edit nama buku:", books[index]);
 
-  // Perbarui tampilan di layar
-  tampilkanData();
+    if (namaBaru !== null && namaBaru.trim() !== "") {
+        books[index] = namaBaru.trim();
+
+        simpanData();
+        tampilkanData();
+    }
 }
 
-// 6. Jalankan fungsi tambahBuku saat tombol "Tambah" diklik
-btnTambah.addEventListener('click', tambahBuku);
+// Hapus data
+function hapusBuku(index) {
+    const yakin = confirm("Yakin ingin menghapus buku ini?");
 
-// 7. Panggil tampilkanData() saat halaman pertama kali dibuka
-// Agar data yang sudah ada di localStorage langsung muncul
+    if (yakin) {
+        books.splice(index, 1);
+
+        simpanData();
+        tampilkanData();
+    }
+}
+
+// Tampilkan saat halaman dibuka
 tampilkanData();
