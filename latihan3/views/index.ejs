@@ -2,244 +2,31 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Perpustakaan API</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Katalog Utama</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Inter & Remix Icon -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800">
-
-    <!-- Header Top -->
-    <header class="bg-indigo-600 text-white shadow-md">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-white/20 p-2 rounded-lg">
-                    <i class="ri-book-read-line text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold">Katalog Perpustakaan REST API</h1>
-                    <p class="text-xs text-indigo-200">Express.js + EJS + Tailwind CSS</p>
-                </div>
-            </div>
-            
-            <!-- Tab Navigation Buttons -->
-            <div class="flex bg-indigo-800/60 p-1.5 rounded-xl border border-indigo-500/30">
-                <button id="btn-all" onclick="switchTab('all')" class="px-4 py-2 text-sm font-medium rounded-lg transition-all bg-white text-indigo-700 shadow-sm">
-                    <i class="ri-apps-line mr-1"></i> Semua
-                </button>
-                <button id="btn-authors" onclick="switchTab('authors')" class="px-4 py-2 text-sm font-medium rounded-lg transition-all text-indigo-100 hover:text-white">
-                    <i class="ri-user-star-line mr-1"></i> Authors
-                </button>
-                <button id="btn-books" onclick="switchTab('books')" class="px-4 py-2 text-sm font-medium rounded-lg transition-all text-indigo-100 hover:text-white">
-                    <i class="ri-book-open-line mr-1"></i> Books
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="max-w-6xl mx-auto px-6 py-8 space-y-8">
-
-        <!-- Stat Ringkas -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-2xl">
-                    <i class="ri-user-3-line"></i>
-                </div>
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Penulis</p>
-                    <h3 class="text-2xl font-bold text-slate-800"><%= authors.length %> Penulis</h3>
-                </div>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl">
-                    <i class="ri-book-marked-line"></i>
-                </div>
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Buku</p>
-                    <h3 class="text-2xl font-bold text-slate-800"><%= books.length %> Buku</h3>
-                </div>
-            </div>
+<body class="bg-gray-50 p-10">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
+        <h1 class="text-2xl font-bold text-center mb-6">📚 Katalog Semua Data</h1>
+        
+        <!-- Navigasi -->
+        <div class="flex justify-center gap-2 mb-6">
+            <a href="/" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-sm">Tampilkan Semua</a>
+            <a href="/books" class="bg-sky-600 text-white px-4 py-1.5 rounded-lg text-sm">Daftar Buku</a>
+            <a href="/authors" class="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm">Daftar Penulis</a>
         </div>
 
-        <!-- Tabel Section: Authors -->
-        <section id="section-authors" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
-            <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="ri-user-star-fill text-blue-600 text-lg"></i>
-                    <h2 class="text-lg font-bold text-slate-800">Daftar Penulis (Authors)</h2>
+        <div class="space-y-3">
+            <% books.forEach(book => { %>
+                <div class="p-4 border rounded-lg bg-gray-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg"><%= book.title %></h3>
+                        <p class="text-sm text-gray-600">Penulis: <%= book.authorName %></p>
+                        <span class="text-xs bg-gray-200 px-2 py-0.5 rounded">Genre: <%= book.genre %></span>
+                    </div>
                 </div>
-                <span class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold"><%= authors.length %> Terdata</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100/70 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
-                            <th class="py-3.5 px-6">ID</th>
-                            <th class="py-3.5 px-6">Nama Penulis</th>
-                            <th class="py-3.5 px-6">Negara Asal</th>
-                            <th class="py-3.5 px-6 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        <% authors.forEach(author => { %>
-                            <tr class="hover:bg-slate-50/80 transition-colors">
-                                <td class="py-4 px-6 font-semibold text-slate-400">#<%= author.id %></td>
-                                <td class="py-4 px-6 font-semibold text-slate-800"><%= author.name %></td>
-                                <td class="py-4 px-6 text-slate-600">
-                                    <span class="inline-flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700">
-                                        <i class="ri-global-line text-slate-400"></i> <%= author.country %>
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-center space-x-2">
-                                    <button onclick="editAuthor(<%= author.id %>, '<%= author.name %>', '<%= author.country %>')" class="bg-amber-100 text-amber-700 hover:bg-amber-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-                                        <i class="ri-edit-line mr-1"></i> Edit
-                                    </button>
-                                    <button onclick="deleteItem('authors', <%= author.id %>)" class="bg-rose-100 text-rose-700 hover:bg-rose-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-                                        <i class="ri-delete-bin-line mr-1"></i> Hapus
-                                    </button>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Tabel Section: Books -->
-        <section id="section-books" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
-            <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="ri-book-open-fill text-emerald-600 text-lg"></i>
-                    <h2 class="text-lg font-bold text-slate-800">Daftar Buku (Books)</h2>
-                </div>
-                <span class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-semibold"><%= books.length %> Terdata</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100/70 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
-                            <th class="py-3.5 px-6">ID</th>
-                            <th class="py-3.5 px-6">Judul Buku</th>
-                            <th class="py-3.5 px-6">ID Penulis</th>
-                            <th class="py-3.5 px-6">Tahun</th>
-                            <th class="py-3.5 px-6">Ketersediaan</th>
-                            <th class="py-3.5 px-6 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        <% books.forEach(book => { %>
-                            <tr class="hover:bg-slate-50/80 transition-colors">
-                                <td class="py-4 px-6 font-semibold text-slate-400">#<%= book.id %></td>
-                                <td class="py-4 px-6 font-bold text-slate-800"><%= book.title %></td>
-                                <td class="py-4 px-6 text-slate-600">
-                                    <span class="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-medium">Author ID: <%= book.authorId %></span>
-                                </td>
-                                <td class="py-4 px-6 text-slate-600 font-medium"><%= book.year %></td>
-                                <td class="py-4 px-6">
-                                    <% if (book.available) { %>
-                                        <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-3 py-1 rounded-full font-semibold">
-                                            <i class="ri-checkbox-circle-fill"></i> Tersedia
-                                        </span>
-                                    <% } else { %>
-                                        <span class="inline-flex items-center gap-1 bg-rose-50 text-rose-700 border border-rose-200 text-xs px-3 py-1 rounded-full font-semibold">
-                                            <i class="ri-close-circle-fill"></i> Dipinjam
-                                        </span>
-                                    <% } %>
-                                </td>
-                                <td class="py-4 px-6 text-center space-x-2">
-                                    <button onclick="editBook(<%= book.id %>, '<%= book.title %>', <%= book.year %>)" class="bg-amber-100 text-amber-700 hover:bg-amber-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-                                        <i class="ri-edit-line mr-1"></i> Edit
-                                    </button>
-                                    <button onclick="deleteItem('books', <%= book.id %>)" class="bg-rose-100 text-rose-700 hover:bg-rose-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-                                        <i class="ri-delete-bin-line mr-1"></i> Hapus
-                                    </button>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Script Tab Switcher & Aksi (Edit / Hapus) -->
-    <script>
-        function switchTab(tab) {
-            const authorsSec = document.getElementById('section-authors');
-            const booksSec = document.getElementById('section-books');
-            const btnAll = document.getElementById('btn-all');
-            const btnAuthors = document.getElementById('btn-authors');
-            const btnBooks = document.getElementById('btn-books');
-
-            [btnAll, btnAuthors, btnBooks].forEach(btn => {
-                btn.className = "px-4 py-2 text-sm font-medium rounded-lg transition-all text-indigo-100 hover:text-white";
-            });
-
-            if (tab === 'authors') {
-                authorsSec.classList.remove('hidden');
-                booksSec.classList.add('hidden');
-                btnAuthors.className = "px-4 py-2 text-sm font-medium rounded-lg transition-all bg-white text-indigo-700 shadow-sm";
-            } else if (tab === 'books') {
-                authorsSec.classList.add('hidden');
-                booksSec.classList.remove('hidden');
-                btnBooks.className = "px-4 py-2 text-sm font-medium rounded-lg transition-all bg-white text-indigo-700 shadow-sm";
-            } else {
-                authorsSec.classList.remove('hidden');
-                booksSec.classList.remove('hidden');
-                btnAll.className = "px-4 py-2 text-sm font-medium rounded-lg transition-all bg-white text-indigo-700 shadow-sm";
-            }
-        }
-
-        // Fungsi Hapus Data
-        async function deleteItem(type, id) {
-            if (confirm(`Apakah Anda yakin ingin menghapus data ${type} ini?`)) {
-                const res = await fetch(`/api/${type}/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    location.reload(); // Refresh halaman setelah dihapus
-                }
-            }
-        }
-
-        // Fungsi Edit Author
-        async function editAuthor(id, currentName, currentCountry) {
-            const newName = prompt("Ubah Nama Penulis:", currentName);
-            const newCountry = prompt("Ubah Negara Asal:", currentCountry);
-
-            if (newName && newCountry) {
-                const res = await fetch(`/api/authors/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: newName, country: newCountry })
-                });
-                if (res.ok) {
-                    location.reload(); // Refresh halaman setelah diubah
-                }
-            }
-        }
-
-        // Fungsi Edit Book
-        async function editBook(id, currentTitle, currentYear) {
-            const newTitle = prompt("Ubah Judul Buku:", currentTitle);
-            const newYear = prompt("Ubah Tahun Terbit:", currentYear);
-
-            if (newTitle && newYear) {
-                const res = await fetch(`/api/books/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: newTitle, year: parseInt(newYear) })
-                });
-                if (res.ok) {
-                    location.reload(); // Refresh halaman setelah diubah
-                }
-            }
-        }
-    </script>
-
+            <% }) %>
+        </div>
+    </div>
 </body>
 </html>
