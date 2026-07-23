@@ -1,59 +1,68 @@
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Middleware agar Express bisa membaca JSON dari request body
+app.set('view engine', 'ejs');
 app.use(express.json());
 
-// Data Dummy (In-Memory Data)
-const books = [
-  { id: 1, title: "Laskar Pelangi", authorId: 1 },
-  { id: 2, title: "Bumi Manusia", authorId: 2 }
+// Data Dummy Utama (Menggunakan let agar data bisa diubah/dihapus)
+let authors = [
+    { id: 1, name: "Robert C. Martin", country: "USA" },
+    { id: 2, name: "James Clear", country: "USA" },
+    { id: 3, name: "Marijn Haverbeke", country: "Netherlands" },
+    { id: 4, name: "Andrea Hirata", country: "Indonesia" }
 ];
 
-const authors = [
-  { id: 1, name: "Andrea Hirata" },
-  { id: 2, name: "Pramoedya Ananta Toer" }
+let books = [
+    { id: 1, title: "Clean Code", authorId: 1, year: 2008, available: true },
+    { id: 2, title: "Atomic Habits", authorId: 2, year: 2018, available: false },
+    { id: 3, title: "Eloquent JavaScript", authorId: 3, year: 2018, available: true },
+    { id: 4, title: "Laskar Pelangi", authorId: 4, year: 2005, available: true }
 ];
 
-// --- ENDPOINT BOOKS ---
-
-// GET: Ambil semua buku
-app.get('/api/books', (req, res) => {
-  res.json({ success: true, data: books });
+// Route Utama untuk Tampilan EJS
+app.get('/', (req, res) => {
+    res.render('index', { authors, books });
 });
 
-// GET: Ambil buku berdasarkan ID
-app.get('/api/books/:id', (req, res) => {
-  const book = books.find(b => b.id === parseInt(req.params.id));
-  if (!book) return res.status(404).json({ success: false, message: "Buku tidak ditemukan" });
-  res.json({ success: true, data: book });
+// --- ENDPOINT HAPUS (DELETE) ---
+app.delete('/api/authors/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    authors = authors.filter(a => a.id !== id);
+    res.json({ message: "Author berhasil dihapus" });
 });
 
-// POST: Tambah buku baru
-app.post('/api/books', (req, res) => {
-  const { title, authorId } = req.body;
-  if (!title || !authorId) {
-    return res.status(400).json({ success: false, message: "Title dan authorId wajib diisi" });
-  }
-
-  const newBook = {
-    id: books.length + 1,
-    title,
-    authorId
-  };
-  books.push(newBook);
-  res.status(201).json({ success: true, data: newBook });
+app.delete('/api/books/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    books = books.filter(b => b.id !== id);
+    res.json({ message: "Buku berhasil dihapus" });
 });
 
-// --- ENDPOINT AUTHORS ---
-
-// GET: Ambil semua penulis
-app.get('/api/authors', (req, res) => {
-  res.json({ success: true, data: authors });
+// --- ENDPOINT EDIT (PUT) ---
+app.put('/api/authors/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const author = authors.find(a => a.id === id);
+    if (author) {
+        author.name = req.body.name || author.name;
+        author.country = req.body.country || author.country;
+        res.json({ message: "Author berhasil diperbarui" });
+    } else {
+        res.status(404).json({ message: "Author tidak ditemukan" });
+    }
 });
 
-// Jalankan Server
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
+app.put('/api/books/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const book = books.find(b => b.id === id);
+    if (book) {
+        book.title = req.body.title || book.title;
+        book.year = req.body.year || book.year;
+        res.json({ message: "Buku berhasil diperbarui" });
+    } else {
+        res.status(404).json({ message: "Buku tidak ditemukan" });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server berjalan di http://localhost:${port}`);
 });
