@@ -1,107 +1,58 @@
-const path = require('path');
 const express = require('express');
+const path = require('path');
+const cors = require('cors'); // Optional: Menghindari isu CORS
 const app = express();
 const PORT = 3000;
 
-// Konfigurasi EJS & Folder Views
+// Middleware parsing body request (Penting jika nanti ada fitur POST/DELETE)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors()); // Mengizinkan request API dari mana saja
+
+// Set EJS sebagai view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Middleware Form Data & JSON
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
 // Data Dummy
 let books = [
-    { id: 1, title: "Laskar Pelangi", authorId: 1, genre: "Novel" },
-    { id: 2, title: "Bumi Manusia", authorId: 2, genre: "Sejarah" }
+  { id: 1, title: 'Laskar Pelangi', author: 'Andrea Hirata', genre: 'Novel', authorId: 1 },
+  { id: 2, title: 'Bumi Manusia', author: 'Pramoedya Ananta Toer', genre: 'Sejarah', authorId: 2 }
 ];
 
 let authors = [
-    { id: 1, name: "Andrea Hirata" },
-    { id: 2, name: "Pramoedya Ananta Toer" }
+  { id: 1, name: 'Andrea Hirata', country: 'Indonesia' },
+  { id: 2, name: 'Pramoedya Ananta Toer', country: 'Indonesia' }
 ];
 
-// Helper Function: Gabung Buku & Penulis
-function getFormattedBooks() {
-    return books.map(book => {
-        const author = authors.find(a => a.id === book.authorId);
-        return {
-            ...book,
-            authorName: author ? author.name : 'Tidak Diketahui'
-        };
-    });
-}
+// --- ENDPOINT API JSON (Terekam di Inspect Network & Postman) ---
+app.get('/api/books', (req, res) => {
+  res.json(books);
+});
 
-// =========================================================
-// ROUTE FRONTEND (Masing-masing panggil file EJS tersendiri)
-// =========================================================
+app.get('/api/authors', (req, res) => {
+  res.json(authors);
+});
 
-// 1. Halaman Utama: Tampilkan Semua Data
+// Endpoint DELETE (Bonus: Agar fungsi deleteBook() di frontend berjalan tanpa error)
+app.delete('/api/books/:id', (req, res) => {
+  const bookId = parseInt(req.params.id);
+  books = books.filter(b => b.id !== bookId);
+  res.json({ message: 'Buku berhasil dihapus', books });
+});
+
+// --- ROUTE EJS (Render Tampilan Halaman HTML) ---
 app.get('/', (req, res) => {
-    res.render('index', { books: getFormattedBooks() });
+  res.render('index');
 });
 
-// 2. Halaman Khusus Buku
 app.get('/books', (req, res) => {
-    res.render('books-list', { books: getFormattedBooks() });
+  res.render('books-list');
 });
 
-// 3. Halaman Khusus Penulis
 app.get('/authors', (req, res) => {
-    res.render('authors', { authors: authors });
+  res.render('authors');
 });
 
-// 4. Halaman Form Tambah Buku
-app.get('/books/add', (req, res) => {
-    res.render('tambah', { authors: authors });
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
-
-// Proses Tambah Buku (POST)
-app.post('/books/add', (req, res) => {
-    const { title, genre, authorId } = req.body;
-    const newBook = {
-        id: books.length ? books[books.length - 1].id + 1 : 1,
-        title,
-        genre: genre || 'Umum',
-        authorId: parseInt(authorId)
-    };
-    books.push(newBook);
-    res.redirect('/books');
-});
-
-// 5. Halaman Form Edit Buku
-app.get('/books/edit/:id', (req, res) => {
-    const bookId = parseInt(req.params.id);
-    const bookToEdit = books.find(b => b.id === bookId);
-    if (!bookToEdit) return res.redirect('/books');
-
-    res.render('edit', { book: bookToEdit, authors: authors });
-});
-
-// Proses Update Buku (POST)
-app.post('/books/update/:id', (req, res) => {
-    const bookId = parseInt(req.params.id);
-    const { title, genre, authorId } = req.body;
-    
-    const bookIndex = books.findIndex(b => b.id === bookId);
-    if (bookIndex !== -1) {
-        books[bookIndex] = {
-            id: bookId,
-            title,
-            genre,
-            authorId: parseInt(authorId)
-        };
-    }
-    res.redirect('/books');
-});
-
-// 6. Proses Hapus Buku
-app.get('/books/delete/:id', (req, res) => {
-    const bookId = parseInt(req.params.id);
-    books = books.filter(b => b.id !== bookId);
-    res.redirect('/books');
-});
-
-// Jalankan Server
-app.listen(PORT, () => console.log(`Server running: http://localhost:3000`));
