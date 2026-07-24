@@ -1,32 +1,128 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Katalog Utama</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Utama</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background-color: #f8f9fa; }
+    .btn-group { margin-bottom: 20px; }
+    .btn { padding: 8px 16px; margin-right: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; text-decoration: none; display: inline-block; }
+    .btn-all { background-color: #2c3e50; }
+    .btn-books { background-color: #3498db; }
+    .btn-authors { background-color: #2ecc71; }
+    .card { background: white; padding: 15px; margin-bottom: 12px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .card h3 { margin: 0 0 5px 0; color: #2c3e50; }
+    .card p { margin: 2px 0; color: #666; font-size: 14px; }
+  </style>
 </head>
-<body class="bg-gray-50 p-10">
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
-        <h1 class="text-2xl font-bold text-center mb-6">📚 Katalog Semua Data</h1>
-        
-        <!-- Navigasi -->
-        <div class="flex justify-center gap-2 mb-6">
-            <a href="/" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-sm">Tampilkan Semua</a>
-            <a href="/books" class="bg-sky-600 text-white px-4 py-1.5 rounded-lg text-sm">Daftar Buku</a>
-            <a href="/authors" class="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm">Daftar Penulis</a>
-        </div>
+<body>
 
-        <div class="space-y-3">
-            <% books.forEach(book => { %>
-                <div class="p-4 border rounded-lg bg-gray-50 flex justify-between items-center">
-                    <div>
-                        <h3 class="font-bold text-lg"><%= book.title %></h3>
-                        <p class="text-sm text-gray-600">Penulis: <%= book.authorName %></p>
-                        <span class="text-xs bg-gray-200 px-2 py-0.5 rounded">Genre: <%= book.genre %></span>
-                    </div>
-                </div>
-            <% }) %>
-        </div>
-    </div>
+  <h2>📚 Katalog Semua Data</h2>
+
+  <div class="btn-group">
+    <button class="btn btn-all" onclick="loadAllData()">Tampilkan Semua</button>
+    <button class="btn btn-books" onclick="loadBooks()">Daftar Buku</button>
+    <button class="btn btn-authors" onclick="loadAuthors()">Daftar Penulis</button>
+  </div>
+
+  <div id="content-list">
+    <p>Memuat data dari API...</p>
+  </div>
+
+  <script>
+    const contentList = document.getElementById('content-list');
+
+    // 1. Fetch Data Buku saja
+    async function loadBooks() {
+      try {
+        contentList.innerHTML = '<p>Memuat data buku...</p>';
+        const response = await fetch('/api/books'); // Terekam di Inspect -> Network
+        const books = await response.json();
+        
+        let html = '';
+        books.forEach(b => {
+          html += `
+            <div class="card">
+              <h3>${b.title}</h3>
+              <p>Penulis: ${b.author || b.authorName || '-'}</p>
+              <p>Genre: ${b.genre || '-'}</p>
+            </div>`;
+        });
+        contentList.innerHTML = html || '<p>Tidak ada data buku.</p>';
+      } catch (err) {
+        console.error('Error fetching books:', err);
+        contentList.innerHTML = '<p style="color:red;">Gagal mengambil data buku dari API.</p>';
+      }
+    }
+
+    // 2. Fetch Data Penulis saja
+    async function loadAuthors() {
+      try {
+        contentList.innerHTML = '<p>Memuat data penulis...</p>';
+        const response = await fetch('/api/authors'); // Terekam di Inspect -> Network
+        const authors = await response.json();
+
+        let html = '';
+        authors.forEach(a => {
+          html += `
+            <div class="card">
+              <h3>${a.name}</h3>
+              <p>Asal Negara: ${a.country || '-'}</p>
+            </div>`;
+        });
+        contentList.innerHTML = html || '<p>Tidak ada data penulis.</p>';
+      } catch (err) {
+        console.error('Error fetching authors:', err);
+        contentList.innerHTML = '<p style="color:red;">Gagal mengambil data penulis dari API.</p>';
+      }
+    }
+
+    // 3. Fetch BOTH (Dua API Sekaligus): /api/books DAN /api/authors
+    function loadAllData() {
+      contentList.innerHTML = '<p>Memuat semua data dari API...</p>';
+
+      // Menggunakan Promise.all agar kedua API dipanggil bersamaan
+      // Kedua request ini AKAN MUNCUL SEKALIGUS di Inspect -> Network
+      Promise.all([
+        fetch('/api/books').then(res => res.json()),
+        fetch('/api/authors').then(res => res.json())
+      ])
+      .then(([books, authors]) => {
+        let html = '';
+
+        // Render Data Buku
+        html += '<h3 style="color: #2c3e50; margin-top: 20px;">Daftar Buku:</h3>';
+        books.forEach(b => {
+          html += `
+            <div class="card">
+              <h3>${b.title}</h3>
+              <p>Penulis: ${b.author || b.authorName || '-'}</p>
+              <p>Genre: ${b.genre || '-'}</p>
+            </div>`;
+        });
+
+        // Render Data Penulis
+        html += '<h3 style="color: #2c3e50; margin-top: 20px;">Daftar Penulis:</h3>';
+        authors.forEach(a => {
+          html += `
+            <div class="card">
+              <h3>${a.name}</h3>
+              <p>Asal Negara: ${a.country || '-'}</p>
+            </div>`;
+        });
+
+        contentList.innerHTML = html;
+      })
+      .catch(err => {
+        console.error('Error fetching all data:', err);
+        contentList.innerHTML = '<p style="color:red;">Gagal mengambil data dari API.</p>';
+      });
+    }
+
+    // Jalankan pemanggilan semua API saat halaman pertama kali dibuka
+    loadAllData();
+  </script>
+
 </body>
 </html>
